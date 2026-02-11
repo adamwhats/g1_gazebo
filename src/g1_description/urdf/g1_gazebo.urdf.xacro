@@ -24,6 +24,7 @@
         <param name="min">-2.618</param>
         <param name="max">2.618</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -34,6 +35,7 @@
         <param name="min">-3.0892</param>
         <param name="max">2.6704</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -42,6 +44,7 @@
         <param name="min">-1.5882</param>
         <param name="max">2.2515</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -50,6 +53,7 @@
         <param name="min">-2.618</param>
         <param name="max">2.618</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -58,6 +62,7 @@
         <param name="min">-1.0472</param>
         <param name="max">2.0944</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -66,6 +71,7 @@
         <param name="min">-1.972222054</param>
         <param name="max">1.972222054</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -76,6 +82,7 @@
         <param name="min">-3.0892</param>
         <param name="max">2.6704</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -84,6 +91,7 @@
         <param name="min">-2.2515</param>
         <param name="max">1.5882</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -92,6 +100,7 @@
         <param name="min">-2.618</param>
         <param name="max">2.618</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -100,6 +109,7 @@
         <param name="min">-1.0472</param>
         <param name="max">2.0944</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -108,6 +118,7 @@
         <param name="min">-1.972222054</param>
         <param name="max">1.972222054</param>
       </command_interface>
+      <command_interface name="velocity"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -157,6 +168,34 @@
             name="gz_ros2_control::GazeboSimROS2ControlPlugin">
       <parameters>$(find g1_gazebo)/config/g1_controllers.yaml</parameters>
     </plugin>
+  </gazebo>
+
+  <!-- RGB Camera Plugin at d435 link -->
+  <gazebo reference="d435_link">
+    <sensor name="d435_camera" type="camera">
+      <pose>0 0 0 0 -0.2 0</pose>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <always_on>1</always_on>
+      <topic>d435/image_raw</topic>
+      <camera name="d435">
+        <horizontal_fov>1.5</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>100</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+    </sensor>
   </gazebo>
 
 </robot>

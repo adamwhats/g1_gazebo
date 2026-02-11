@@ -31,6 +31,8 @@ setup(
             'ik_service = g1_task.ik_service:main',
             'joint_trajectory_test = g1_task.joint_trajectory_test:main',
             'task_sequencer = g1_task.task_sequencer:main',
+            'joy_input = g1_task.joy_input:main',
+            'teleop = g1_task.teleop:main',
         ],
     },
 )

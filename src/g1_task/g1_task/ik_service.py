@@ -8,9 +8,7 @@ from kdl_parser_py.urdf import treeFromFile
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import JointState
-from std_msgs.msg import ColorRGBA
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from visualization_msgs.msg import Marker
 
 from g1_interfaces.srv import ComputeTrajectory
 
@@ -33,31 +31,34 @@ class IKService(Node):
             if not ok:
                 raise RuntimeError(f"Failed to parse URDF: {urdf_path}")
 
-            # Arm chains: pelvis -> wrist
+            # Arm chains: waist -> wrist
+            left_joints = [
+                'waist_yaw_joint',
+                'left_shoulder_pitch_joint',
+                'left_shoulder_roll_joint',
+                'left_shoulder_yaw_joint',
+                'left_elbow_joint',
+                'left_wrist_roll_joint',
+            ]
+            right_joints = [
+                'waist_yaw_joint',
+                'right_shoulder_pitch_joint',
+                'right_shoulder_roll_joint',
+                'right_shoulder_yaw_joint',
+                'right_elbow_joint',
+                'right_wrist_roll_joint',
+            ]
+
             self.arms = {
                 'left': {
                     'base_link': 'pelvis',
                     'tip_link': 'left_wrist_roll_rubber_hand',
-                    'joint_names': [
-                        'waist_yaw_joint',
-                        'left_shoulder_pitch_joint',
-                        'left_shoulder_roll_joint',
-                        'left_shoulder_yaw_joint',
-                        'left_elbow_joint',
-                        'left_wrist_roll_joint',
-                    ],
+                    'joint_names': left_joints,
                 },
                 'right': {
                     'base_link': 'pelvis',
                     'tip_link': 'right_wrist_roll_rubber_hand',
-                    'joint_names': [
-                        'waist_yaw_joint',
-                        'right_shoulder_pitch_joint',
-                        'right_shoulder_roll_joint',
-                        'right_shoulder_yaw_joint',
-                        'right_elbow_joint',
-                        'right_wrist_roll_joint',
-                    ],
+                    'joint_names': right_joints,
                 },
             }
 
@@ -78,7 +79,6 @@ class IKService(Node):
 
         qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE, durability=DurabilityPolicy.VOLATILE)
         self.joint_state_sub = self.create_subscription(JointState, '/joint_states', self.joint_state_callback, qos)
-        self.marker_pub = self.create_publisher(Marker, '/ik_target_markers', 10)
         self.ik_service = self.create_service(ComputeTrajectory, 'compute_trajectory', self.compute_ik_callback)
         self.get_logger().info('IK Service ready')
 
@@ -109,12 +109,12 @@ class IKService(Node):
             self.current_joint_states[name] = position
         self.joint_state_received = True
 
-    def compute_ik_callback(self, request: ComputeTrajectory.Request, response: ComputeTrajectory.Response) -> ComputeTrajectory.Response:
+    def compute_ik_callback(
+        self, request: ComputeTrajectory.Request, response: ComputeTrajectory.Response
+    ) -> ComputeTrajectory.Response:
         arm = request.arm_name
         pos = request.goal.pose.position
         self.get_logger().info(f'IK request for {arm} arm -> [{pos.x:.3f}, {pos.y:.3f}, {pos.z:.3f}]')
-
-        self._publish_target_marker(request.goal, arm)
 
         if arm not in self.arms:
             self.get_logger().error(f'Invalid arm name: {arm}. Must be "left" or "right"')
@@ -128,6 +128,7 @@ class IKService(Node):
 
         arm_config = self.arms[arm]
 
+        # Get current joint positions as seed for IK solver
         try:
             seed_joints = [self.current_joint_states.get(j, 0.0) for j in arm_config['joint_names']]
         except KeyError as e:
@@ -161,7 +162,11 @@ class IKService(Node):
 
         response.success = True
         response.trajectory = self._generate_trajectory(
-            arm_config['joint_names'], seed_joints, solution, self.trajectory_duration, self.num_waypoints
+            arm_config['joint_names'],
+            seed_joints,
+            solution,
+            self.trajectory_duration,
+            self.num_waypoints,
         )
         return response
 
@@ -236,26 +241,6 @@ class IKService(Node):
             trajectory.points.append(point)
 
         return trajectory
-
-    def _publish_target_marker(self, pose_stamped, arm_name: str):
-        marker = Marker()
-        marker.header = pose_stamped.header
-        marker.ns = f"ik_target_{arm_name}"
-        marker.id = 0 if arm_name == "left" else 1
-        marker.type = Marker.ARROW
-        marker.action = Marker.ADD
-        marker.pose = pose_stamped.pose
-        marker.scale.x = 0.15
-        marker.scale.y = 0.02
-        marker.scale.z = 0.02
-        marker.color = ColorRGBA(
-            r=0.0 if arm_name == "left" else 1.0,
-            g=0.5 if arm_name == "left" else 0.0,
-            b=1.0 if arm_name == "left" else 0.5,
-            a=0.8,
-        )
-        marker.lifetime.sec = 5
-        self.marker_pub.publish(marker)
 
 
 def main(args=None):

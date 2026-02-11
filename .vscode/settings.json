@@ -1,0 +1,63 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+        }
+    },
+
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format",
+        "editor.formatOnSave": true
+    },
+    "cmake.configureOnOpen": false,
+    "files.associations": {
+        "*.launch": "xml",
+        "*.world": "xml",
+        "*.xacro": "xml",
+        "*.urdf": "xml",
+        "*.sdf": "xml"
+    },
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+        "path": "/bin/bash",
+        "args": ["-l"]
+        }
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.pythonProjects": [],
+    "python.analysis.extraPaths": [
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages",
+        "/xavbot_ws/install/xavbot/lib/python3.10/site-packages",
+        "/xavbot_ws/install/xavbot_bringup/lib/python3.10/site-packages",
+        "/xavbot_ws/install/xavbot_description/lib/python3.10/site-packages",
+        "/xavbot_ws/build/xavbot",
+        "/xavbot_ws/build/xavbot_bringup",
+        "/xavbot_ws/build/xavbot_description"
+    ],
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages",
+        "/xavbot_ws/install/xavbot/lib/python3.10/site-packages",
+        "/xavbot_ws/install/xavbot_bringup/lib/python3.10/site-packages",
+        "/xavbot_ws/install/xavbot_description/lib/python3.10/site-packages",
+        "/xavbot_ws/build/xavbot",
+        "/xavbot_ws/build/xavbot_bringup",
+        "/xavbot_ws/build/xavbot_description"
+    ],
+    "ruff.configuration": {
+        "line-length": 120,
+        "lint": {
+            "dummy-variable-rgx": "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$",
+        },
+        "format": {
+            "quote-style": "preserve"
+        }
+    },  
+    "urdf-visualizer.packages": {
+        "g1_description": "src/g1_description",
+    },
+}

@@ -9,13 +9,14 @@ ENV GZ_VERSION=harmonic
 # Install basic utilities
 RUN apt-get update && apt-get install -y \
     curl \
+    evtest\
+    git \
     gnupg2 \
     lsb-release \
-    wget \
-    git \
-    vim \
     nano \
     sudo \
+    vim \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Add Gazebo package repository
@@ -80,9 +81,9 @@ RUN apt-get update \
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc \
     && echo "if [ -f /workspace/install/setup.bash ]; then source /workspace/install/setup.bash; fi" >> /root/.bashrc \
     && echo "export GZ_VERSION=harmonic" >> /root/.bashrc \
-    && echo "alias build='cd /workspace && colcon build --packages-up-to g1_task --symlink-install'" >> /root/.bash_aliases \
-    && echo "alias debug='cd /workspace && ros2 launch g1_task g1_full.launch.py use_rviz:=true log_level:=debug'" >> /root/.bash_aliases \
-    && echo "alias launch='cd /workspace && ros2 launch g1_task g1_full.launch.py'" >> /root/.bash_aliases
+    && echo "alias build='cd /workspace && colcon build --packages-up-to g1_task --symlink-install && . install/setup.bash'" >> /root/.bash_aliases \
+    && echo "alias ik='cd /workspace && ros2 launch g1_task ik.launch.py use_rviz:=true log_level:=info'" >> /root/.bash_aliases \
+    && echo "alias teleop='cd /workspace && ros2 launch g1_task teleop.launch.py use_rviz:=true log_level:=info'" >> /root/.bash_aliases
 
 WORKDIR /workspace
 

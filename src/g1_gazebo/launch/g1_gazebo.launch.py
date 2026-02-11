@@ -108,7 +108,79 @@ def generate_launch_description():
         package='ros_gz_sim',
         executable='create',
         output='screen',
-        arguments=['-name', 'g1', '-topic', 'robot_description', '-x', '5.5', '-y', '0.9', '-z', '0'],
+        arguments=['-name', 'g1', '-topic', 'robot_description', '-x', '5.5', '-y', '1.0', '-z', '0'],
+    )
+
+    # Spawn simple box object
+    box_sdf = '''<?xml version="1.0" ?>
+<sdf version="1.7">
+    <model name="simple_box">
+        <static>false</static>
+        <link name="link">
+            <inertial>
+                <mass>0.2</mass>
+                <inertia>
+                    <ixx>0.0005</ixx>
+                    <iyy>0.0009</iyy>
+                    <izz>0.0007</izz>
+                </inertia>
+            </inertial>
+            <collision name="collision">
+                <geometry>
+                    <box>
+                        <size>0.06 0.06 0.1</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>0.9</mu>
+                            <mu2>0.9</mu2>
+                        </ode>
+                    </friction>
+                    <contact>
+                        <ode>
+                            <kp>1e6</kp>
+                            <kd>100</kd>
+                        </ode>
+                    </contact>
+                </surface>
+            </collision>
+            <visual name="visual">
+                <geometry>
+                    <box>
+                        <size>0.1 0.1 0.1.5</size>
+                    </box>
+                </geometry>
+                <material>
+                    <ambient>0.8 0.2 0.2 1</ambient>
+                    <diffuse>0.8 0.2 0.2 1</diffuse>
+                </material>
+            </visual>
+        </link>
+    </model>
+</sdf>'''
+
+    box_sdf_file = tempfile.NamedTemporaryFile(mode='w', suffix='.sdf', delete=False)
+    box_sdf_file.write(box_sdf)
+    box_sdf_file.close()
+
+    spawn_box = Node(
+        package='ros_gz_sim',
+        executable='create',
+        output='screen',
+        arguments=[
+            '-name',
+            'simple_box',
+            '-file',
+            box_sdf_file.name,
+            '-x',
+            '5.85',
+            '-y',
+            '1.0',
+            '-z',
+            '0.885',
+        ],
     )
 
     # Controller spawners with a delay
@@ -141,6 +213,7 @@ def generate_launch_description():
     ld.add_action(gazebo_client)
     ld.add_action(g1_description)
     ld.add_action(spawn_g1)
+    ld.add_action(spawn_box)
     ld.add_action(OpaqueFunction(function=start_bridge))
     ld.add_action(delayed_controllers)
 

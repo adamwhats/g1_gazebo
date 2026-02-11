@@ -12,7 +12,7 @@ find_package(rclpy REQUIRED)
 find_package(ros_gz_sim REQUIRED)
 find_package(ros_gz_bridge REQUIRED)
 
-# Install launch files
+# Install launch files and config
 install(DIRECTORY
   launch
   config

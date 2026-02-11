@@ -8,6 +8,9 @@ controller_manager:
     arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
+    arm_velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
 arm_controller:
   ros__parameters:
     joints:
@@ -38,3 +41,26 @@ arm_controller:
     constraints:
       stopped_velocity_tolerance: 0.01
       goal_time: 0.0
+
+arm_velocity_controller:
+  ros__parameters:
+    joints:
+      - left_shoulder_pitch_joint
+      - left_shoulder_roll_joint
+      - left_shoulder_yaw_joint
+      - left_elbow_joint
+      - left_wrist_roll_joint
+      - right_shoulder_pitch_joint
+      - right_shoulder_roll_joint
+      - right_shoulder_yaw_joint
+      - right_elbow_joint
+      - right_wrist_roll_joint
+
+    command_interfaces:
+      - velocity
+
+    state_interfaces:
+      - position
+      - velocity
+
+    state_publish_rate: 50.0
