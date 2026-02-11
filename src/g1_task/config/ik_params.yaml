@@ -1,0 +1,4 @@
+g1_ik_service:
+  ros__parameters:
+    trajectory_duration: 0.3
+    num_waypoints: 5

@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="g1">
+
+  <!-- Include the base G1 URDF -->
+  <xacro:include filename="$(find g1_description)/urdf/g1.urdf"/>
+
+  <!-- Pin pelvis to world for upper-body-only simulation -->
+  <link name="world"/>
+  <joint name="world_to_pelvis" type="fixed">
+    <parent link="world"/>
+    <child link="pelvis"/>
+    <origin xyz="0 0 0.8" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ros2_control hardware interface for upper-body joints -->
+  <ros2_control name="GazeboSimSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+
+    <!-- Waist -->
+    <joint name="waist_yaw_joint">
+      <command_interface name="position">
+        <param name="min">-2.618</param>
+        <param name="max">2.618</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <!-- Left arm -->
+    <joint name="left_shoulder_pitch_joint">
+      <command_interface name="position">
+        <param name="min">-3.0892</param>
+        <param name="max">2.6704</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="left_shoulder_roll_joint">
+      <command_interface name="position">
+        <param name="min">-1.5882</param>
+        <param name="max">2.2515</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="left_shoulder_yaw_joint">
+      <command_interface name="position">
+        <param name="min">-2.618</param>
+        <param name="max">2.618</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="left_elbow_joint">
+      <command_interface name="position">
+        <param name="min">-1.0472</param>
+        <param name="max">2.0944</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="left_wrist_roll_joint">
+      <command_interface name="position">
+        <param name="min">-1.972222054</param>
+        <param name="max">1.972222054</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <!-- Right arm -->
+    <joint name="right_shoulder_pitch_joint">
+      <command_interface name="position">
+        <param name="min">-3.0892</param>
+        <param name="max">2.6704</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="right_shoulder_roll_joint">
+      <command_interface name="position">
+        <param name="min">-2.2515</param>
+        <param name="max">1.5882</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="right_shoulder_yaw_joint">
+      <command_interface name="position">
+        <param name="min">-2.618</param>
+        <param name="max">2.618</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="right_elbow_joint">
+      <command_interface name="position">
+        <param name="min">-1.0472</param>
+        <param name="max">2.0944</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="right_wrist_roll_joint">
+      <command_interface name="position">
+        <param name="min">-1.972222054</param>
+        <param name="max">1.972222054</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <!-- Leg joints (state-only so joint_state_broadcaster publishes TFs) -->
+    <joint name="left_hip_pitch_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="left_hip_roll_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="left_hip_yaw_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="left_knee_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="left_ankle_pitch_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="left_ankle_roll_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="right_hip_pitch_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="right_hip_roll_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="right_hip_yaw_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="right_knee_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="right_ankle_pitch_joint">
+      <state_interface name="position"/>
+    </joint>
+    <joint name="right_ankle_roll_joint">
+      <state_interface name="position"/>
+    </joint>
+  </ros2_control>
+
+  <!-- gz_ros2_control plugin -->
+  <gazebo>
+    <plugin filename="gz_ros2_control-system"
+            name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find g1_gazebo)/config/g1_controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+</robot>

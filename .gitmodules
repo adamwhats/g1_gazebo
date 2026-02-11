@@ -1,0 +1,7 @@
+[submodule "src/kobuki"]
+	path = src/kobuki
+	url = https://github.com/IntelligentRoboticsLabs/kobuki.git
+	branch = jazzy
+[submodule "src/kdl_parser_py"]
+	path = src/kdl_parser_py
+	url = https://github.com/ros/kdl_parser_py.git

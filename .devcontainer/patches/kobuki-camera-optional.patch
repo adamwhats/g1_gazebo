@@ -1,0 +1,35 @@
+diff --git a/launch/simulation.launch.py b/launch/simulation.launch.py
+index 8e313f0..6631c61 100644
+--- a/launch/simulation.launch.py
++++ b/launch/simulation.launch.py
+@@ -44,6 +44,12 @@ def generate_launch_description():
+         description='Set to false to run gazebo headless',
+     )
+ 
++    camera_arg = DeclareLaunchArgument(
++        'camera',
++        default_value='false',
++        description='Enable RGB-D camera (disable for better performance)',
++    )
++
+     gazebo_server = IncludeLaunchDescription(
+         PythonLaunchDescriptionSource(
+             os.path.join(get_package_share_directory('ros_gz_sim'), 'launch',
+@@ -65,6 +71,9 @@ def generate_launch_description():
+         PythonLaunchDescriptionSource([os.path.join(
+             get_package_share_directory('kobuki_description'),
+             'launch/'), 'spawn.launch.py']),
++        launch_arguments={
++            'camera': LaunchConfiguration('camera'),
++        }.items(),
+     )
+ 
+     fake_bumper = Node(
+@@ -89,6 +98,7 @@ def generate_launch_description():
+     ld.add_action(SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', model_path))
+     ld.add_action(world_arg)
+     ld.add_action(gui_arg)
++    ld.add_action(camera_arg)
+     ld.add_action(gazebo_server)
+     ld.add_action(gazebo_client)
+     ld.add_action(spawn_robot)
