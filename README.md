@@ -26,7 +26,7 @@ xhost +local:
 ```bash
 sudo apt-get install -y evtest
 evtest
-# Note the event number (e.g., /dev/input/event24)
+# Note the event number (e.g., /dev/input/event7)
 ```
 
 ## Run
@@ -54,7 +54,7 @@ docker run -it --rm \
 Runs the simulation with gamepad teleoperation control:
 
 ```bash
-# Replace event24 with the controller's event number from evtest
+# Replace event7 with the controller's event number from evtest
 docker run -it --rm \
   --privileged \
   --network host \
@@ -67,10 +67,21 @@ docker run -it --rm \
   g1_gazebo \
   bash -c "source /opt/ros/jazzy/setup.bash && \
            source install/setup.bash && \
-           ros2 launch g1_task teleop.launch.py device:=/dev/input/event24"
+           ros2 launch g1_task teleop.launch.py device:=/dev/input/event7"
 ```
 
 **Teleop Options:**
 - `device:=/dev/input/eventXX` - Specify your gamepad device
 - `gui:=true` - Show Gazebo GUI (default: false for first-person camera view only)
 - `log_level:=debug` - Set logging level (info, debug, warn, error)
+
+## Troubleshooting
+
+### Missing third-party packages (aws_robomaker, kobuki_ros, etc.)
+
+The third-party repos are imported via `vcs` during the Docker build. In the container run
+   ```bash
+   cd /workspace/src && vcs import < kobuki/thirdparty.repos
+   colcon build --packages-up-to g1_task --symlink-install
+   source install/setup.bash
+   ```
