@@ -11,13 +11,13 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    device_arg = DeclareLaunchArgument('device', default_value='/dev/input/event24', description='Gamepad device')
+    device_arg = DeclareLaunchArgument('device', default_value='/dev/input/event19', description='Gamepad device')
     log_level_arg = DeclareLaunchArgument('log_level', default_value='info', description='Log level for ROS nodes')
     gui_arg = DeclareLaunchArgument('gui', default_value='false', description='Launch Gazebo GUI')
 
     sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('g1_task'), 'launch', 'sim.launch.py')),
-        launch_arguments={'gui': LaunchConfiguration('gui')}.items()
+        launch_arguments={'gui': LaunchConfiguration('gui')}.items(),
     )
 
     spawn_velocity_controller = Node(
@@ -62,4 +62,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    return LaunchDescription([device_arg, log_level_arg, gui_arg, sim, delayed_controller, joy_and_teleop, rqt_image_view])
+    return LaunchDescription(
+        [device_arg, log_level_arg, gui_arg, sim, delayed_controller, joy_and_teleop, rqt_image_view]
+    )

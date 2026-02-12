@@ -6,7 +6,7 @@ import rclpy
 from ament_index_python.packages import get_package_share_directory
 from kdl_parser_py.urdf import treeFromFile
 from rclpy.node import Node
-from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import JointState, Joy
 from std_msgs.msg import ColorRGBA, Float64MultiArray
 from visualization_msgs.msg import Marker, MarkerArray
@@ -19,7 +19,7 @@ class TeleopNode(Node):
         # Parameters
         self.declare_parameter('reference_frame', 'torso_link')
         self.declare_parameter('velocity_scale', 0.3)
-        self.declare_parameter('update_rate', 50.0)
+        self.declare_parameter('update_rate', 30.0)
         self.declare_parameter('damping_factor', 0.05)
         self.declare_parameter('max_joint_velocity', 1.5)
 
@@ -28,6 +28,9 @@ class TeleopNode(Node):
         self.update_rate = self.get_parameter('update_rate').value
         self.damping_factor = self.get_parameter('damping_factor').value
         self.max_joint_velocity = self.get_parameter('max_joint_velocity').value
+
+        # BEST_EFFORT QoS for all teleop topics
+        self.best_effort_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
 
         # Workspace bounds
         self.x_bounds = (0.2, 0.4)
@@ -41,21 +44,20 @@ class TeleopNode(Node):
         # Joint state tracking
         self.current_joint_states = {}
         self.joint_state_received = False
-        qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE, durability=DurabilityPolicy.VOLATILE)
-        self.create_subscription(JointState, '/joint_states', self._joint_state_callback, qos)
+        self.create_subscription(JointState, '/joint_states', self._joint_state_callback, self.best_effort_qos)
 
         # Joystick input and commanded velocities for debugging
         self.last_joy = None
         self.left_cart_vel = [0.0, 0.0, 0.0]
         self.right_cart_vel = [0.0, 0.0, 0.0]
         self.reset_requested = False
-        self.create_subscription(Joy, 'joy', self._joy_callback, 10)
+        self.create_subscription(Joy, 'joy', self._joy_callback, self.best_effort_qos)
 
         # Markers for visualization
         self.marker_pub = self.create_publisher(MarkerArray, '/ik_target_markers', 10)
 
         # Velocity command publisher
-        self.vel_pub = self.create_publisher(Float64MultiArray, '/arm_velocity_controller/commands', 10)
+        self.vel_pub = self.create_publisher(Float64MultiArray, '/arm_velocity_controller/commands', self.best_effort_qos)
 
         # Velocity control timer
         self.create_timer(1.0 / self.update_rate, self._velocity_update)
@@ -63,7 +65,7 @@ class TeleopNode(Node):
         # Marker update timer
         self.create_timer(0.1, self._publish_markers)
 
-        self.get_logger().info(f'Teleop ready (true velocity control at {self.update_rate}Hz)')
+        self.get_logger().info(f'Teleop ready ({self.update_rate}Hz)')
 
     def _setup_kdl(self):
         """Initialize KDL kinematics"""
@@ -208,8 +210,9 @@ class TeleopNode(Node):
         return np.clip(joint_positions, limits[:, 0], limits[:, 1])
 
     def _velocity_update(self):
-        """Velocity control loop at configured update rate (default 50Hz)."""
+        """Velocity control loop at configured update rate (default 30Hz)."""
         if self.last_joy is None or not self.joint_state_received:
+            self.get_logger().info('Waiting for joy or joint_states...', throttle_duration_sec=2.0)
             return
 
         # Handle reset to home
@@ -367,13 +370,8 @@ def main(args=None):
     rclpy.init(args=args)
     node = TeleopNode()
 
-    from rclpy.executors import MultiThreadedExecutor
-
-    executor = MultiThreadedExecutor()
-    executor.add_node(node)
-
     try:
-        executor.spin()
+        rclpy.spin(node)
     except KeyboardInterrupt:
         pass
     finally:

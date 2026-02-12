@@ -57,7 +57,7 @@ class TeleopNode(Node):
     def __init__(self):
         super().__init__('g1_teleop')
 
-        self.declare_parameter('device', '/dev/input/event7')
+        self.declare_parameter('device', '/dev/input/event19')
         self.declare_parameter('deadzone', 0.02)
         self.declare_parameter('publish_rate', 30.0)
 
