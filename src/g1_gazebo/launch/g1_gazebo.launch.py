@@ -128,7 +128,7 @@ def generate_launch_description():
             <collision name="collision">
                 <geometry>
                     <box>
-                        <size>0.06 0.06 0.1</size>
+                        <size>0.1 0.1 0.15</size>
                     </box>
                 </geometry>
                 <surface>
@@ -149,7 +149,7 @@ def generate_launch_description():
             <visual name="visual">
                 <geometry>
                     <box>
-                        <size>0.1 0.1 0.1.5</size>
+                        <size>0.1 0.1 0.15</size>
                     </box>
                 </geometry>
                 <material>
