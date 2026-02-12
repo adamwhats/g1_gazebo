@@ -77,6 +77,11 @@ RUN apt-get update \
     && rosdep install --from-paths /workspace/src --ignore-src -r -y \
     && apt-get install -y libusb-1.0-0-dev libftdi1-dev libuvc-dev
 
+# Build the workspace
+RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && cd /workspace \
+    && colcon build --packages-up-to g1_task --symlink-install"
+
 # Set up ROS environment for root
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc \
     && echo "if [ -f /workspace/install/setup.bash ]; then source /workspace/install/setup.bash; fi" >> /root/.bashrc \
